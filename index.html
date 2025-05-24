@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dost - Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font and general body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text color */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            scroll-behavior: smooth; /* Smooth scrolling for anchor links */
+        }
+
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* Darker track */
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* Slightly lighter thumb */
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #626d80; /* Even lighter on hover */
+        }
+
+        /* Ensure images and videos fit within their containers */
+        img, video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem; /* Rounded corners for media */
+        }
+
+        /* Styles for truncated content */
+        .truncated-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Show max 3 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Floating Action Button (FAB) styles */
+        #fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #6d28d9; /* Purple */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 9999px; /* Fully rounded */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 50; /* Above other content, below modals */
+        }
+
+        #fab:hover {
+            background-color: #5b21b6; /* Darker purple on hover */
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-gray-900 shadow-lg p-4 md:p-6 flex flex-col md:flex-row items-center justify-between rounded-b-xl sticky top-0 z-40">
+        <div class="text-3xl font-bold text-white mb-4 md:mb-0">Dost</div>
+        <div id="userIdDisplay" class="text-sm text-gray-400">Loading User ID...</div>
+        <button id="navToggle" class="md:hidden text-white focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+        <nav id="mainNav" class="hidden md:flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 mt-4 md:mt-0">
+            <a href="#home" class="text-gray-300 hover:text-white transition duration-300 ease-in-out px-3 py-2 rounded-md">Home</a>
+            <a href="#blog-posts-section" class="text-gray-300 hover:text-white transition duration-300 ease-in-out px-3 py-2 rounded-md">Blog Posts</a>
+            <a href="#photos-section" class="text-gray-300 hover:text-white transition duration-300 ease-in-out px-3 py-2 rounded-md">Photos</a>
+            <a href="#videos-section" class="text-gray-300 hover:text-white transition duration-300 ease-in-out px-3 py-2 rounded-md">Videos</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 flex-grow">
+        <section id="home" class="bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">Welcome to Dost!</h2>
+            <p class="text-gray-300 mb-4">This is a space for us to share our thoughts, articles, stories, and visual content. Feel free to explore and contribute!</p>
+            <a href="#blog-posts-section" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out shadow-md">
+                View All Posts
+            </a>
+        </section>
+
+        <section id="blog-posts-section" class="mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">Blog Posts</h2>
+            <div id="blogPostsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </section>
+
+        <section id="photos-section" class="mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">Photos</h2>
+            <div id="photosContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                </div>
+        </section>
+
+        <section id="videos-section" class="mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">Videos</h2>
+            <div id="videosContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+        </section>
+    </main>
+
+    <button id="fab" class="focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Add Post
+    </button>
+
+    <footer class="bg-gray-900 text-gray-400 text-center p-4 mt-8 rounded-t-xl">
+        <p>&copy; 2025 Dost. All rights reserved.</p>
+    </footer>
+
+    <div id="mediaModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-900 p-4 rounded-lg max-w-3xl w-full mx-4 relative">
+            <button id="closeMediaModal" class="absolute top-2 right-2 text-white text-2xl font-bold">&times;</button>
+            <div id="mediaModalContent" class="flex justify-center items-center">
+                </div>
+        </div>
+    </div>
+
+    <div id="fullPostModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-4xl w-full mx-4 relative overflow-y-auto max-h-[90vh]">
+            <button id="closeFullPostModal" class="absolute top-2 right-2 text-white text-2xl font-bold">&times;</button>
+            <div id="fullPostContent" class="text-gray-300">
+                </div>
+            <div class="mt-6 border-t border-gray-700 pt-4">
+                <h3 class="text-xl font-semibold text-white mb-3">Comments</h3>
+                <div id="commentsContainer" class="space-y-4 mb-4">
+                    </div>
+                <form id="commentForm" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input type="hidden" id="commentPostId">
+                    <textarea id="commentText" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 placeholder-gray-400 text-white flex-grow" rows="2" placeholder="Add a comment..." required></textarea>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out shadow-md">
+                        Post Comment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="newPostModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-2xl w-full mx-4 relative overflow-y-auto max-h-[90vh]">
+            <button id="closeNewPostModal" class="absolute top-2 right-2 text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-4">Create New Post</h2>
+            <form id="newPostForm" class="space-y-4">
+                <div>
+                    <label for="newPostTitle" class="block text-gray-300 text-sm font-bold mb-2">Title:</label>
+                    <input type="text" id="newPostTitle" name="newPostTitle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 placeholder-gray-400 text-white" placeholder="Enter title" required>
+                </div>
+                <div>
+                    <label for="newPostType" class="block text-gray-300 text-sm font-bold mb-2">Type:</label>
+                    <select id="newPostType" name="newPostType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 placeholder-gray-400 text-white" required>
+                        <option value="">Select Type</option>
+                        <option value="thought">Thought</option>
+                        <option value="article">Article</option>
+                        <option value="story">Story</option>
+                        <option value="photo">Photo</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
+                <div id="newContentInput" class="hidden">
+                    <label for="newPostContent" class="block text-gray-300 text-sm font-bold mb-2">Content:</label>
+                    <textarea id="newPostContent" name="newPostContent" rows="6" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 placeholder-gray-400 text-white" placeholder="Write your thought, article, or story here..."></textarea>
+                </div>
+                <div id="newMediaInput" class="hidden">
+                    <label for="newMediaUrl" class="block text-gray-300 text-sm font-bold mb-2">Image/Video URL:</label>
+                    <input type="url" id="newMediaUrl" name="newMediaUrl" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 placeholder-gray-400 text-white" placeholder="Enter URL (e.g., https://example.com/image.jpg)">
+                    <p class="text-sm text-gray-400 mt-1">For photos, use an image URL. For videos, use a direct video URL (e.g., .mp4, .webm).</p>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out shadow-md">
+                    Create Post
+                </button>
+            </form>
+            <div id="newPostMessageBox" class="hidden mt-4 p-3 rounded-md text-sm" role="alert"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase instances and user ID
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null;
+        let unsubscribeComments = null; // To store the unsubscribe function for comments
+
+        // Message Box utility function
+        function showMessageBox(message, type = 'info', targetElementId = 'messageBox') {
+            const messageBox = document.getElementById(targetElementId);
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-blue-500');
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'text-white');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'text-white');
+            } else {
+                messageBox.classList.add('bg-blue-500', 'text-white');
+            }
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        // Initialize Firebase and handle authentication
+        async function initializeFirebase() {
+            try {
+                // Mandatory: Retrieve __app_id and __firebase_config from the environment
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+                // Initialize Firebase app
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Listen for authentication state changes
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // User is signed in.
+                        currentUserId = user.uid;
+                        document.getElementById('userIdDisplay').textContent = `User ID: ${currentUserId}`;
+                        console.log("Firebase initialized and user signed in:", currentUserId);
+                        // Start listening for posts after authentication is ready
+                        listenForPosts();
+                        // Add sample posts if the collection is empty
+                        addSamplePostsIfEmpty();
+                    } else {
+                        // User is signed out. Try to sign in anonymously.
+                        try {
+                            // Mandatory: Use __initial_auth_token if available
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Error during anonymous sign-in or custom token sign-in:", error);
+                            document.getElementById('userIdDisplay').textContent = `Failed to authenticate.`;
+                            showMessageBox(`Authentication failed: ${error.message}`, 'error');
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                document.getElementById('userIdDisplay').textContent = `Firebase Init Error.`;
+                showMessageBox(`Firebase initialization failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Function to add sample posts if the 'posts' collection is empty
+        async function addSamplePostsIfEmpty() {
+            if (!db || !currentUserId) {
+                console.warn("Firestore or User ID not available for adding sample posts.");
+                return;
+            }
+
+            const postsCollectionRef = collection(db, `artifacts/${__app_id}/public/data/posts`);
+            const querySnapshot = await getDocs(postsCollectionRef);
+
+            if (querySnapshot.empty) {
+                console.log("Posts collection is empty. Adding sample data...");
+
+                const samplePosts = [
+                    {
+                        title: "The Art of Mindful Living",
+                        type: "article",
+                        content: "Mindful living is about being present in the moment, observing your thoughts and feelings without judgment. It's a practice that can significantly reduce stress and improve overall well-being. Start by taking a few deep breaths and focusing on your senses. What do you see, hear, smell, taste, and feel right now? Engage fully with simple activities like eating or walking, noticing every detail. This simple shift can bring profound peace and clarity to your daily life. Regular meditation, even for just a few minutes a day, can strengthen your mindfulness muscle. Embrace the journey, and you'll find joy in the everyday.",
+                        mediaUrl: "",
+                        userId: "sample-user-1",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "A Glimpse into the Future of AI",
+                        type: "article",
+                        content: "Artificial Intelligence is rapidly evolving, promising to revolutionize industries from healthcare to transportation. We're seeing advancements in machine learning, natural language processing, and computer vision that were once thought to be decades away. Ethical considerations and the impact on employment are crucial discussions as AI becomes more integrated into our lives. The future holds immense potential for AI to solve complex global challenges, but it also demands thoughtful development and regulation to ensure it serves humanity's best interests. Collaboration between researchers, policymakers, and the public will be key to navigating this exciting new frontier.",
+                        mediaUrl: "",
+                        userId: "sample-user-2",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "My Morning Thought",
+                        type: "thought",
+                        content: "The sunrise today was breathtaking. It reminded me that every day is a new beginning, full of possibilities. It's easy to get caught up in routines, but sometimes, pausing to appreciate the simple beauty around us can reset our perspective.",
+                        mediaUrl: "",
+                        userId: "sample-user-1",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "Lost in the Woods",
+                        type: "story",
+                        content: "The old map, crumpled and faded, was supposed to lead to the whispering falls. But the path had vanished, swallowed by overgrown ferns and ancient trees. A chill wind rustled the leaves, and the forest began to hum with unseen life. Sarah clutched her backpack tighter, her heart pounding. She knew she was lost, but a strange sense of adventure sparked within her. The sun began to dip below the canopy, painting the sky in hues of orange and purple. She had to find shelter before nightfall. Suddenly, a faint light flickered through the trees, a beacon in the deepening twilight...",
+                        mediaUrl: "",
+                        userId: "sample-user-3",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "Mountain View Sunset",
+                        type: "photo",
+                        content: "A stunning sunset over the Rockies.",
+                        mediaUrl: "https://placehold.co/800x600/6d28d9/FFFFFF?text=Mountain+Sunset",
+                        userId: "sample-user-2",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "City Night Lights",
+                        type: "photo",
+                        content: "The vibrant city lights at night.",
+                        mediaUrl: "https://placehold.co/800x600/333333/e2e8f0?text=City+Lights",
+                        userId: "sample-user-1",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "Ocean Waves",
+                        type: "video",
+                        content: "Relaxing video of ocean waves.",
+                        // Placeholder for a video URL. Replace with an actual video URL if you have one.
+                        // For demonstration, I'm using a placeholder image as a fallback.
+                        mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4", // Example public domain video
+                        userId: "sample-user-3",
+                        timestamp: serverTimestamp()
+                    },
+                    {
+                        title: "Forest Walk",
+                        type: "video",
+                        content: "A peaceful walk through a serene forest.",
+                        // Placeholder for a video URL. Replace with an actual video URL if you have one.
+                        mediaUrl: "https://www.w3schools.com/html/movie.mp4", // Another example public domain video
+                        userId: "sample-user-2",
+                        timestamp: serverTimestamp()
+                    }
+                ];
+
+                for (const post of samplePosts) {
+                    try {
+                        await addDoc(postsCollectionRef, post);
+                        console.log(`Added sample post: ${post.title}`);
+                    } catch (e) {
+                        console.error(`Error adding sample post ${post.title}:`, e);
+                    }
+                }
+            } else {
+                console.log("Posts collection is not empty. No sample data added.");
+            }
+        }
+
+        // Function to add a new post to Firestore
+        async function addPost(title, type, content, mediaUrl) {
+            if (!currentUserId) {
+                showMessageBox("Please wait, authentication is not ready yet.", 'error', 'newPostMessageBox');
+                return;
+            }
+            try {
+                // Firestore collection path for public data
+                const postsCollectionRef = collection(db, `artifacts/${__app_id}/public/data/posts`);
+                await addDoc(postsCollectionRef, {
+                    title: title,
+                    type: type,
+                    content: content,
+                    mediaUrl: mediaUrl,
+                    userId: currentUserId, // Store the user ID who created the post
+                    timestamp: serverTimestamp() // Add a server timestamp
+                });
+                showMessageBox("Post added successfully!", 'success', 'newPostMessageBox');
+                document.getElementById('newPostForm').reset(); // Clear the form
+                document.getElementById('newContentInput').classList.add('hidden');
+                document.getElementById('newMediaInput').classList.add('hidden');
+                closeNewPostModal(); // Close the modal after successful submission
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showMessageBox(`Error adding post: ${e.message}`, 'error', 'newPostMessageBox');
+            }
+        }
+
+        // Function to add a new comment to Firestore
+        async function addComment(postId, commentText) {
+            if (!currentUserId) {
+                showMessageBox("Please wait, authentication is not ready yet.", 'error', 'fullPostMessageBox'); // Assuming a message box for full post modal
+                return;
+            }
+            if (!commentText.trim()) {
+                showMessageBox("Comment cannot be empty.", 'error', 'fullPostMessageBox');
+                return;
+            }
+            try {
+                const commentsCollectionRef = collection(db, `artifacts/${__app_id}/public/data/comments`);
+                await addDoc(commentsCollectionRef, {
+                    postId: postId,
+                    commentText: commentText,
+                    userId: currentUserId,
+                    timestamp: serverTimestamp()
+                });
+                document.getElementById('commentText').value = ''; // Clear comment input
+                showMessageBox("Comment added successfully!", 'success', 'fullPostMessageBox');
+            } catch (e) {
+                console.error("Error adding comment: ", e);
+                showMessageBox(`Error adding comment: ${e.message}`, 'error', 'fullPostMessageBox');
+            }
+        }
+
+        // Function to listen for real-time updates to posts
+        function listenForPosts() {
+            if (!db) {
+                console.error("Firestore not initialized.");
+                return;
+            }
+            // Create a query to order by timestamp in descending order (newest first)
+            const q = query(collection(db, `artifacts/${__app_id}/public/data/posts`));
+
+            onSnapshot(q, (snapshot) => {
+                const posts = [];
+                snapshot.forEach((doc) => {
+                    posts.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort posts by timestamp in descending order (newest first)
+                posts.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                displayPosts(posts);
+            }, (error) => {
+                console.error("Error listening for posts:", error);
+                showMessageBox(`Error loading posts: ${error.message}`, 'error');
+            });
+        }
+
+        // Function to listen for comments for a specific post
+        function listenForComments(postId) {
+            if (unsubscribeComments) {
+                unsubscribeComments(); // Unsubscribe from previous comments listener
+            }
+            const commentsContainer = document.getElementById('commentsContainer');
+            commentsContainer.innerHTML = ''; // Clear existing comments
+
+            const q = query(collection(db, `artifacts/${__app_id}/public/data/comments`), orderBy('timestamp', 'asc'));
+
+            unsubscribeComments = onSnapshot(q, (snapshot) => {
+                commentsContainer.innerHTML = ''; // Clear comments before re-rendering
+                snapshot.forEach((doc) => {
+                    const comment = doc.data();
+                    if (comment.postId === postId) { // Filter comments by postId client-side
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'bg-gray-700 p-3 rounded-lg shadow-sm';
+                        commentElement.innerHTML = `
+                            <p class="text-gray-200 text-sm whitespace-pre-wrap">${comment.commentText}</p>
+                            <p class="text-gray-400 text-xs mt-1">By: ${comment.userId} at ${comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleString() : 'Just now'}</p>
+                        `;
+                        commentsContainer.appendChild(commentElement);
+                    }
+                });
+            }, (error) => {
+                console.error("Error listening for comments:", error);
+            });
+        }
+
+        // Function to display posts in their respective containers
+        function displayPosts(posts) {
+            const blogPostsContainer = document.getElementById('blogPostsContainer');
+            const photosContainer = document.getElementById('photosContainer');
+            const videosContainer = document.getElementById('videosContainer');
+
+            // Clear existing content
+            blogPostsContainer.innerHTML = '';
+            photosContainer.innerHTML = '';
+            videosContainer.innerHTML = '';
+
+            posts.forEach(post => {
+                if (post.type === 'thought' || post.type === 'article' || post.type === 'story') {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'bg-gray-700 p-6 rounded-lg shadow-md flex flex-col justify-between'; // Added flex-col and justify-between
+                    let contentHtml = '';
+                    const isLongContent = post.content && post.content.length > 200; // Define a threshold for "long" content
+
+                    if (isLongContent) {
+                        contentHtml = `
+                            <p class="text-gray-300 text-sm truncated-content">${post.content}</p>
+                            <button class="read-more-btn mt-3 bg-purple-500 hover:bg-purple-600 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-300 ease-in-out" data-post-id="${post.id}">Read More</button>
+                        `;
+                    } else if (post.content) {
+                        contentHtml = `<p class="text-gray-300 text-sm whitespace-pre-wrap">${post.content}</p>`;
+                    }
+
+                    postElement.innerHTML = `
+                        <div>
+                            <h3 class="text-xl font-semibold text-white mb-2">${post.title}</h3>
+                            <p class="text-gray-400 text-sm mb-2 capitalize">Type: ${post.type}</p>
+                            ${contentHtml}
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-gray-600">
+                            <p class="text-gray-400 text-xs">Posted by: ${post.userId}</p>
+                            <p class="text-gray-500 text-xs">${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Just now'}</p>
+                        </div>
+                    `;
+                    blogPostsContainer.appendChild(postElement);
+                } else if (post.type === 'photo' && post.mediaUrl) {
+                    const photoElement = document.createElement('div');
+                    photoElement.className = 'bg-gray-700 p-4 rounded-lg shadow-md flex flex-col items-center justify-center';
+                    photoElement.innerHTML = `
+                        <img src="${post.mediaUrl}" alt="${post.title}" class="w-full h-48 object-cover rounded-md cursor-pointer mb-2" onerror="this.src='https://placehold.co/400x300/333333/FFFFFF?text=Image+Not+Found';" onclick="openMediaModal('${post.mediaUrl}', 'image')">
+                        <h3 class="text-lg font-semibold text-white text-center">${post.title}</h3>
+                        <p class="text-gray-400 text-xs mt-1">By: ${post.userId}</p>
+                        <p class="text-gray-500 text-xs">${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Just now'}</p>
+                    `;
+                    photosContainer.appendChild(photoElement);
+                } else if (post.type === 'video' && post.mediaUrl) {
+                    const videoElement = document.createElement('div');
+                    videoElement.className = 'bg-gray-700 p-4 rounded-lg shadow-md flex flex-col items-center justify-center';
+                    videoElement.innerHTML = `
+                        <video controls src="${post.mediaUrl}" class="w-full h-48 object-cover rounded-md cursor-pointer mb-2" onerror="this.src=''; this.alt='Video not found or unsupported format.';" onclick="openMediaModal('${post.mediaUrl}', 'video')"></video>
+                        <h3 class="text-lg font-semibold text-white text-center">${post.title}</h3>
+                        <p class="text-gray-400 text-xs mt-1">By: ${post.userId}</p>
+                        <p class="text-gray-500 text-xs">${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Just now'}</p>
+                    `;
+                    videosContainer.appendChild(videoElement);
+                }
+            });
+
+            // Add event listeners for "Read More" buttons after posts are displayed
+            document.querySelectorAll('.read-more-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId;
+                    const post = posts.find(p => p.id === postId);
+                    if (post) {
+                        openFullPostModal(post);
+                    }
+                });
+            });
+        }
+
+        // Event listener for new post form submission (within the modal)
+        document.getElementById('newPostForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('newPostTitle').value;
+            const type = document.getElementById('newPostType').value;
+            const content = document.getElementById('newPostContent').value;
+            const mediaUrl = document.getElementById('newMediaUrl').value;
+
+            if (!title || !type) {
+                showMessageBox("Please fill in all required fields (Title and Type).", 'error', 'newPostMessageBox');
+                return;
+            }
+
+            // Validate content or mediaUrl based on type
+            if (type === 'thought' || type === 'article' || type === 'story') {
+                if (!content) {
+                    showMessageBox("Content is required for Thoughts, Articles, and Stories.", 'error', 'newPostMessageBox');
+                    return;
+                }
+            } else if (type === 'photo' || type === 'video') {
+                if (!mediaUrl) {
+                    showMessageBox("Image/Video URL is required for Photos and Videos.", 'error', 'newPostMessageBox');
+                    return;
+                }
+            }
+
+            addPost(title, type, content, mediaUrl);
+        });
+
+        // Event listener for new post type change to show/hide content/media input (within the modal)
+        document.getElementById('newPostType').addEventListener('change', (e) => {
+            const selectedType = e.target.value;
+            const contentInput = document.getElementById('newContentInput');
+            const mediaInput = document.getElementById('newMediaInput');
+            const postContent = document.getElementById('newPostContent');
+            const mediaUrl = document.getElementById('newMediaUrl');
+
+            if (selectedType === 'thought' || selectedType === 'article' || selectedType === 'story') {
+                contentInput.classList.remove('hidden');
+                mediaInput.classList.add('hidden');
+                postContent.setAttribute('required', 'true');
+                mediaUrl.removeAttribute('required');
+            } else if (selectedType === 'photo' || selectedType === 'video') {
+                contentInput.classList.add('hidden');
+                mediaInput.classList.remove('hidden');
+                postContent.removeAttribute('required');
+                mediaUrl.setAttribute('required', 'true');
+            } else {
+                contentInput.classList.add('hidden');
+                mediaInput.classList.add('hidden');
+                postContent.removeAttribute('required');
+                mediaUrl.removeAttribute('required');
+            }
+        });
+
+        // Mobile navigation toggle
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('mainNav').classList.toggle('hidden');
+            document.getElementById('mainNav').classList.toggle('flex');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                // Hide mobile nav after clicking
+                if (document.getElementById('mainNav').classList.contains('flex')) {
+                    document.getElementById('mainNav').classList.remove('flex');
+                    document.getElementById('mainNav').classList.add('hidden');
+                }
+            });
+        });
+
+        // Media Modal functionality
+        const mediaModal = document.getElementById('mediaModal');
+        const closeMediaModalBtn = document.getElementById('closeMediaModal');
+        const mediaModalContent = document.getElementById('mediaModalContent');
+
+        // Global function to open media modal (called from onclick in displayPosts)
+        window.openMediaModal = (url, type) => {
+            mediaModalContent.innerHTML = ''; // Clear previous content
+            if (type === 'image') {
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Enlarged Image';
+                img.className = 'max-h-[80vh] object-contain rounded-md';
+                img.onerror = () => { img.src = `https://placehold.co/600x400/333333/FFFFFF?text=Image+Not+Found`; };
+                mediaModalContent.appendChild(img);
+            } else if (type === 'video') {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.src = url;
+                video.className = 'max-h-[80vh] object-contain rounded-md';
+                video.onerror = () => { mediaModalContent.innerHTML = `<p class="text-red-400">Video not found or unsupported format.</p>`; };
+                mediaModalContent.appendChild(video);
+            }
+            mediaModal.classList.remove('hidden');
+        };
+
+        closeMediaModalBtn.addEventListener('click', () => {
+            mediaModal.classList.add('hidden');
+            mediaModalContent.innerHTML = ''; // Clear content when closing
+        });
+
+        // Close media modal if clicked outside content
+        mediaModal.addEventListener('click', (e) => {
+            if (e.target === mediaModal) {
+                mediaModal.classList.add('hidden');
+                mediaModalContent.innerHTML = '';
+            }
+        });
+
+        // Full Post Modal functionality (for blog posts with comments)
+        const fullPostModal = document.getElementById('fullPostModal');
+        const closeFullPostModalBtn = document.getElementById('closeFullPostModal');
+        const fullPostContentDiv = document.getElementById('fullPostContent');
+        const commentForm = document.getElementById('commentForm');
+        const commentPostIdInput = document.getElementById('commentPostId');
+        const commentTextInput = document.getElementById('commentText');
+
+        window.openFullPostModal = (post) => {
+            fullPostContentDiv.innerHTML = `
+                <h2 class="text-3xl font-bold text-white mb-3">${post.title}</h2>
+                <p class="text-gray-400 text-md mb-4 capitalize">Type: ${post.type} | Posted by: ${post.userId} | ${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Just now'}</p>
+                <p class="text-gray-300 text-base whitespace-pre-wrap leading-relaxed">${post.content}</p>
+            `;
+            commentPostIdInput.value = post.id; // Set the post ID for the comment form
+            listenForComments(post.id); // Start listening for comments for this specific post
+            fullPostModal.classList.remove('hidden');
+        };
+
+        closeFullPostModalBtn.addEventListener('click', () => {
+            fullPostModal.classList.add('hidden');
+            fullPostContentDiv.innerHTML = '';
+            document.getElementById('commentsContainer').innerHTML = ''; // Clear comments
+            if (unsubscribeComments) {
+                unsubscribeComments(); // Unsubscribe from comments
+            }
+        });
+
+        // Close full post modal if clicked outside content
+        fullPostModal.addEventListener('click', (e) => {
+            if (e.target === fullPostModal) {
+                fullPostModal.classList.add('hidden');
+                fullPostContentDiv.innerHTML = '';
+                document.getElementById('commentsContainer').innerHTML = '';
+                if (unsubscribeComments) {
+                    unsubscribeComments();
+                }
+            }
+        });
+
+        // Handle comment form submission
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const postId = commentPostIdInput.value;
+            const commentText = commentTextInput.value;
+            addComment(postId, commentText);
+        });
+
+        // New Post Modal functionality
+        const newPostModal = document.getElementById('newPostModal');
+        const closeNewPostModalBtn = document.getElementById('closeNewPostModal');
+        const fabButton = document.getElementById('fab');
+
+        fabButton.addEventListener('click', () => {
+            newPostModal.classList.remove('hidden');
+        });
+
+        closeNewPostModalBtn.addEventListener('click', () => {
+            closeNewPostModal();
+        });
+
+        // Close new post modal if clicked outside content
+        newPostModal.addEventListener('click', (e) => {
+            if (e.target === newPostModal) {
+                closeNewPostModal();
+            }
+        });
+
+        function closeNewPostModal() {
+            newPostModal.classList.add('hidden');
+            document.getElementById('newPostForm').reset(); // Reset the form
+            document.getElementById('newContentInput').classList.add('hidden'); // Hide content input
+            document.getElementById('newMediaInput').classList.add('hidden'); // Hide media input
+            document.getElementById('newPostMessageBox').classList.add('hidden'); // Hide message box
+        }
+
+        // Initialize Firebase when the window loads
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
